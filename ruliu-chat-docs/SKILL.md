@@ -32,19 +32,21 @@ KU 和内搜依赖本机 UGate 缓存：
 ~/.config/uuap/.eac_ugate_token_<uuap>
 ```
 
-不要让用户把 UGate token 发到聊天里。让用户在本机普通浏览器打开：
+先用大白话引导用户在本机普通浏览器打开：
 
 ```text
 https://uuap.baidu.com/agent/token
 ```
 
-如果页面没有显示 `ugate token: ...`，先让用户过百度网关/SSO，再刷新。然后用本地脚本缓存：
+如果页面没有显示 `ugate token: ...`，先让用户过百度网关/SSO，再刷新。让用户复制页面里的 token 内容，然后停止操作，等待用户明确回复“已复制”或直接提供 token 后，再运行本地脚本缓存。不要先启动脚本让它长时间等待剪贴板。
+
+用户只复制到剪贴板时：
 
 ```bash
 bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/cache-ugate-token.sh" "<uuap>"
 ```
 
-纯终端或沙箱不能读剪贴板时：
+纯终端、沙箱不能读剪贴板，或用户已经在聊天里提供 token 时，用 stdin 模式把 token 传给脚本。可以处理用户发来的 token，但不要在回复、日志、文档或仓库里复述完整 token：
 
 ```bash
 bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/cache-ugate-token.sh" "<uuap>" --stdin
@@ -177,7 +179,7 @@ bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-cha
 
 ## 安全边界
 
-- 不打印、不复述、不写入 UGate token、Bearer token、AK/SK。
+- 可以处理用户提供的 UGate token、Bearer token、AK/SK，但不打印、不复述、不写入文档或仓库。
 - 不把 `private/`、本地 token 缓存、个人密钥打包进仓库。
 - 删除文档前二次确认。
 - 对替换类任务不要用 append 糊过去；必须改真实位置并读回验证。

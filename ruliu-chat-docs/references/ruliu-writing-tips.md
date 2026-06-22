@@ -196,7 +196,7 @@ ku query-content --doc-id "<docGuid>" --protocol json --show-doc-info
 
 ## 安全边界
 
-- 不把 UGate token、Bearer token、AK/SK 写入文档或聊天。
+- 可以处理用户提供的 UGate token、Bearer token、AK/SK；不要把这些凭据写入文档、仓库或最终回复。
 - 不把 `private/` 打包给别人。
 - 删除文档前必须二次确认。
 - 对源文档做同步类任务时，只写明确允许的目标文档。

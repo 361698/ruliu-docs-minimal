@@ -9,12 +9,11 @@ Usage:
   ./scripts/cache-ugate-token.sh <uuap> --stdin
 
 What it does:
-  1. Opens https://uuap.baidu.com/agent/token in the browser, unless --stdin is used.
-  2. Waits for you to copy the page text or raw JWT token, or reads it from stdin with --stdin.
-  3. Extracts the UGate JWT token from the clipboard or stdin.
-  4. Saves it to ~/.config/uuap/.eac_ugate_token_<uuap>, which ku-darwin-arm64 reads.
+  1. Reads the current clipboard, or reads token text from stdin with --stdin.
+  2. Extracts a UGate JWT token from the copied page text or raw JWT token.
+  3. Saves it to ~/.config/uuap/.eac_ugate_token_<uuap>, which ku-darwin-arm64 reads.
 
-Do not paste the token into chat. Copy it in the browser and let this script read the clipboard locally.
+Run this after the user has copied the token page content. The script reads once; it does not wait for clipboard changes.
 EOF
 }
 
@@ -62,26 +61,22 @@ if [ "$READ_STDIN" -eq 0 ] && ! command -v pbpaste >/dev/null 2>&1; then
   exit 1
 fi
 
-if [ "$READ_STDIN" -eq 0 ] && command -v open >/dev/null 2>&1; then
-  open "$TOKEN_URL" >/dev/null 2>&1 || true
-fi
-
 if [ "$READ_STDIN" -eq 1 ]; then
   cat <<EOF
-请先在浏览器访问：
+请确认用户已经在浏览器访问：
   $TOKEN_URL
 
-如果浏览器没有通过百度网关，请先完成网关/SSO 登录，刷新后看到 token 页面。
-然后把整行 "ugate token: eyJ..." 或纯 JWT 粘贴到这个终端，最后按 Ctrl-D。
+如果浏览器没有通过百度网关，请先让用户完成网关/SSO 登录，刷新后看到 token 页面。
+然后把整行 "ugate token: eyJ..." 或纯 JWT 通过 stdin 传入，最后按 Ctrl-D。
 EOF
 else
   cat <<EOF
-已打开 UGate token 页面：
+请先让用户在浏览器访问：
   $TOKEN_URL
 
 如果浏览器没有通过百度网关，请先完成网关/SSO 登录，刷新后看到 token 页面。
-请在浏览器里复制 token 页面内容。可以复制整行 "ugate token: eyJ..."，也可以只复制 eyJ... 这段 JWT。
-脚本会在本机剪贴板里等待最多 5 分钟，不会把 token 打印出来。
+确认用户已经复制 token 页面内容后，再运行本脚本。
+本脚本只读取当前剪贴板一次；不会等待剪贴板变化，也不会把 token 打印出来。
 EOF
 fi
 
@@ -95,8 +90,8 @@ if not text:
     sys.exit(1)
 
 patterns = [
-    r"ugate\s+token\s*[:：]\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)",
-    r"([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)",
+    r"ugate\s+token\s*[:：]\s*(eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)",
+    r"\b(eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)\b",
 ]
 
 for pattern in patterns:
@@ -113,17 +108,12 @@ TOKEN=""
 if [ "$READ_STDIN" -eq 1 ]; then
   TOKEN="$(cat | extract_token 2>/dev/null || true)"
 else
-  for _ in $(seq 1 300); do
-    CLIP="$(pbpaste 2>/dev/null || true)"
-    if TOKEN="$(printf "%s" "$CLIP" | extract_token 2>/dev/null)"; then
-      break
-    fi
-    sleep 1
-  done
+  CLIP="$(pbpaste 2>/dev/null || true)"
+  TOKEN="$(printf "%s" "$CLIP" | extract_token 2>/dev/null || true)"
 fi
 
 if [ -z "$TOKEN" ]; then
-  echo "没有从剪贴板识别到 UGate JWT token。请重新复制页面里的 token 后再运行脚本。" >&2
+  echo "没有识别到 UGate JWT token。请确认用户已经复制页面里的 eyJ... token，然后再运行脚本。" >&2
   exit 1
 fi
 
