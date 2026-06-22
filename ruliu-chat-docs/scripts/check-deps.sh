@@ -29,7 +29,7 @@ check_path "$SKILL_DIR/SKILL.md"
 check_exec "$SKILL_DIR/deps/ku-doc-manage/bin/ku"
 check_exec "$SKILL_DIR/deps/ku-doc-manage/bin/ku-darwin-arm64"
 check_path "$SKILL_DIR/deps/enterprise-search/scripts/ku_search.py"
-check_path "$SKILL_DIR/deps/get-ugate-token/getUgateToken.py"
+check_exec "$SKILL_DIR/scripts/cache-ugate-token.sh"
 
 uuap="${SANDBOX_USERNAME:-${BAIDU_CC_USERNAME:-}}"
 if [ -n "$uuap" ] && [ -f "$HOME/.config/uuap/.eac_ugate_token_${uuap}" ]; then
