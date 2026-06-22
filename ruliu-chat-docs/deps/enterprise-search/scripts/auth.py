@@ -2,7 +2,8 @@
 """
 统一认证模块 - 企业搜索所有脚本共享。
 
-仅从本地缓存文件读取 ugate token；缺失时退出码 2，由 Agent 调用 get-ugate-token skill 后再重试。
+仅从本地缓存文件读取 ugate token；缺失时退出码 2，由 Agent 调用
+scripts/cache-ugate-token.sh 缓存 UGate 后再重试。
 
 使用方式：
     from auth import get_auth_headers, get_auth_info
@@ -18,11 +19,8 @@ from typing import Optional
 
 def _read_ugate_token_from_file(username: str) -> Optional[str]:
     """从 ~/.config/uuap/.eac_ugate_token_{username} 读取 token。"""
-    bundled_private = Path(__file__).resolve().parents[3] / "private"
     candidates = [
         Path.home() / ".config" / "uuap" / f".eac_ugate_token_{username}",
-        bundled_private / f"ugate_token_{username}",
-        bundled_private / "ugate_token",
     ]
     cache_file = next((p for p in candidates if p.is_file()), None)
     if cache_file is None:
@@ -69,7 +67,7 @@ class AuthConfig:
                 file=sys.stderr,
             )
             print(
-                "请先调用 get-ugate-token skill 完成授权或写入 token，再重试本操作。",
+                "请先运行 ruliu-chat-docs/scripts/cache-ugate-token.sh 缓存 UGate，再重试本操作。",
                 file=sys.stderr,
             )
             sys.exit(2)
