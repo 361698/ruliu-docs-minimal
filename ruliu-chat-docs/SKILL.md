@@ -50,24 +50,18 @@ bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/cache-ugate-token.sh" "<uuap>"
 bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/cache-ugate-token.sh" "<uuap>" --stdin
 ```
 
-## 快速验证
+## 运行前检查
 
-安装后先跑：
+确认工具文件：
 
 ```bash
 bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/check-deps.sh"
 ```
 
-查询用户信息，并从返回里拿个人知识库 `userPersonalRepo.repositoryGuid`：
+确认身份，并从返回里拿个人知识库 `userPersonalRepo.repositoryGuid`：
 
 ```bash
 bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" query-user-info --username "$SANDBOX_USERNAME"'
-```
-
-新电脑跑通验证时，在用户个人知识库创建 `hello world`，再读回确认：
-
-```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; INFO="$("$KU" query-user-info --username "$SANDBOX_USERNAME")"; REPO_ID="$(printf "%s" "$INFO" | sed -n "s/.*\"repositoryGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; CREATE="$("$KU" create-doc --repo-id "$REPO_ID" --username "$SANDBOX_USERNAME" --title "hello world" --content "hello world\n\n这是新电脑 Agent 自动创建的测试文档，用于验证 ruliu-chat-docs 已经跑通。" --process-images=false)"; printf "%s\n" "$CREATE"; DOC_ID="$(printf "%s" "$CREATE" | sed -n "s/.*\"docGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -n "$DOC_ID" ]; then "$KU" query-content --doc-id "$DOC_ID" --protocol markdown --show-doc-info; fi'
 ```
 
 ## 读取文档
@@ -96,16 +90,25 @@ bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-cha
 
 ## 创建文档和子文档
 
-在用户个人知识库创建文档时，不要省略 `--repo-id`。先 `query-user-info`，解析 `userPersonalRepo.repositoryGuid`：
+在用户个人知识库创建文档时，不要省略 `--repo-id`。先 `query-user-info`，解析 `userPersonalRepo.repositoryGuid`。
+
+不要只依赖 `create-doc --content` 来写正文。实测中 `create-doc` 能创建标题和返回 `docGuid`，但正文可能落在 title 节点的 `markdown.content` 元数据里，而不是可见正文区。稳定流程是：
+
+1. `create-doc --create-mode empty` 创建文档并拿 `docGuid`。
+2. `edit-content --editor-mode append` 写入正文 card。
+3. `publish-doc` 发布。
+4. `query-content --protocol markdown` 读回确认标题、正文和链接。
+
+创建个人知识库文档并写入正文：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; INFO="$("$KU" query-user-info --username "$SANDBOX_USERNAME")"; REPO_ID="$(printf "%s" "$INFO" | sed -n "s/.*\"repositoryGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; "$KU" create-doc --repo-id "$REPO_ID" --username "$SANDBOX_USERNAME" --title "新文档标题" --content "正文内容" --process-images=false'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; INFO="$("$KU" query-user-info --username "$SANDBOX_USERNAME")"; REPO_ID="$(printf "%s" "$INFO" | sed -n "s/.*\"repositoryGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$REPO_ID" ]; then echo "ERROR: repositoryGuid not found" >&2; exit 1; fi; CREATE="$("$KU" create-doc --repo-id "$REPO_ID" --username "$SANDBOX_USERNAME" --title "文档标题" --create-mode empty --process-images=false)"; DOC_ID="$(printf "%s" "$CREATE" | sed -n "s/.*\"docGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$DOC_ID" ]; then echo "ERROR: docGuid not found" >&2; printf "%s\n" "$CREATE"; exit 1; fi; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"paragraph","children":[{"text":"正文内容"}]}]}]'\''; "$KU" edit-content --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "$DOC_ID" --protocol markdown --show-doc-info'
 ```
 
 创建子文档：KU 文档可当目录用。传父文档 ID：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" create-doc --repo-id "<repositoryGuid>" --parent-doc-id "<parentDocGuid>" --username "$SANDBOX_USERNAME" --title "子文档标题" --content "正文内容" --process-images=false'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; CREATE="$("$KU" create-doc --repo-id "<repositoryGuid>" --parent-doc-id "<parentDocGuid>" --username "$SANDBOX_USERNAME" --title "子文档标题" --create-mode empty --process-images=false)"; DOC_ID="$(printf "%s" "$CREATE" | sed -n "s/.*\"docGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$DOC_ID" ]; then echo "ERROR: docGuid not found" >&2; printf "%s\n" "$CREATE"; exit 1; fi; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"paragraph","children":[{"text":"正文内容"}]}]}]'\''; "$KU" edit-content --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "$DOC_ID" --protocol markdown --show-doc-info'
 ```
 
 创建完必须读回，确认标题、URL、层级和正文可见。

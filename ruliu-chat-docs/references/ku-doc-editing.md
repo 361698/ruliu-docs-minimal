@@ -260,7 +260,7 @@ def clean_text(text: str) -> str:
 {"text": "强调文字", "bold": true, "italic": true}
 ```
 
-下划线和删除线在工具栏上存在，但本次样本文档没有稳定 JSON 样本。可先在测试文档小样本验证：
+下划线和删除线在工具栏上存在，但本次样本文档没有稳定 JSON 样本。可先在临时样本文档小样本确认：
 
 ```json
 {
@@ -642,23 +642,23 @@ python3 -m http.server 8765 --bind 127.0.0.1
 }
 ```
 
-状态：已在源文档 JSON 观测到结构，但尚未单独做“写入后 UI 可点击”的小样本验证。正式批量写入前建议先在测试文档追加一个链接并读回确认。
+状态：已在源文档 JSON 观测到结构，但尚未单独做“写入后 UI 可点击”的小样本确认。正式批量写入前建议先在临时样本文档追加一个链接并读回确认。
 
 ## Markdown 和 Mermaid
 
-### 创建文档时用 Markdown
+### 创建文档和 Markdown
 
-`create-doc` 支持 `--content` 或 `--md-file`，并可自动处理 Markdown 图片。
+`create-doc` 支持 `--content` 或 `--md-file`，并可自动处理 Markdown 图片；但不要把它当作稳定正文写入路径。实测中创建接口可能把正文放到 title 节点的 `markdown.content` 元数据里，而不是可见正文区。创建带正文的普通文档时，优先创建空文档拿 `docGuid`，然后用 `edit-content append` 写正文、`publish-doc` 发布、再读回确认。
 
 ```bash
 "$KU" create-doc \
   --repo-id "<repo-guid>" \
   --username "$USERNAME" \
   --title "带 Markdown 的文档" \
-  --md-file "/absolute/path/to/doc.md"
+  --create-mode empty
 ```
 
-如果 Markdown 里有本地图片，建议用 `--md-file`，工具会自动把文件所在目录作为图片相对路径基础目录。
+如果 Markdown 里有本地图片，先上传图片并按目标文档的 `attachId` 生成 image 节点；不要直接依赖创建接口处理复杂正文。
 
 ### 编辑已有文档时插入 Mermaid
 

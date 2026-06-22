@@ -20,7 +20,8 @@ KU 普通文档可以被表达为编辑器 JSON。读取时：
 
 写入时：
 
-- 创建文档可以直接传 Markdown 或 `--md-file`。
+- `create-doc` 主要用于创建文档壳、标题、层级并拿 `docGuid`；不要把 `create-doc --content` 当作稳定正文写入路径。
+- 创建带正文的普通文档，优先使用 `create-doc --create-mode empty` 后接 `edit-content append`、`publish-doc`、读回确认。
 - 编辑已有普通文档正文使用 `edit-content --operations '<JSON数组>'`。
 - `append` 是追加到末尾，最安全。
 - `cover` 是覆盖正文，能做替换、删除、中间插入，但必须先读回 JSON 并备份。
