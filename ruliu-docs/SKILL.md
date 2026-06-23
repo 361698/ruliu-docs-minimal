@@ -1,11 +1,11 @@
 ---
-name: ruliu-chat-docs
+name: ruliu-docs
 description: 如流聊天和如流/KU 文档操作入口。Use when the user mentions 如流、RuLiu、Infoflow、ku.baidu-int.com、知识库、KU 文档、读取/创建/编辑/发布/删除/评论/权限/子文档/在线表格/数据表、企业内搜、知识库搜索、会议/周报/OKR/通讯录搜索，或需要把内容写成如流文档、表格、图片、附件、Mermaid/流程图。
 ---
 
-# ruliu-chat-docs
+# ruliu-docs
 
-此 skill 面向 `ruliu-chat-docs` 文件夹，提供如流/KU 文档读取、搜索、创建、编辑、发布、删除、子文档、表格、图片、附件和图示内容写入的操作经验。技能名和文件夹名固定为 `ruliu-chat-docs`。
+此 skill 面向 `ruliu-docs` 文件夹，提供如流/KU 文档读取、搜索、创建、编辑、发布、删除、子文档、表格、图片、附件和图示内容写入的操作经验。技能名和文件夹名固定为 `ruliu-docs`。
 
 ## 先读哪些文件
 
@@ -45,13 +45,13 @@ https://uuap.baidu.com/agent/token
 用户只复制到剪贴板时：
 
 ```bash
-bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/cache-ugate-token.sh" "<uuap>"
+bash "$HOME/.codex/skills/ruliu-docs/scripts/cache-ugate-token.sh" "<uuap>"
 ```
 
 纯终端、沙箱不能读剪贴板，或用户已经在聊天里提供 token 时，用 stdin 模式把 token 传给脚本。可以处理用户发来的 token，但不要在回复、日志、文档或仓库里复述完整 token：
 
 ```bash
-bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/cache-ugate-token.sh" "<uuap>" --stdin
+bash "$HOME/.codex/skills/ruliu-docs/scripts/cache-ugate-token.sh" "<uuap>" --stdin
 ```
 
 ## 运行前检查
@@ -59,13 +59,13 @@ bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/cache-ugate-token.sh" "<uuap>"
 确认工具文件：
 
 ```bash
-bash "$HOME/.codex/skills/ruliu-chat-docs/scripts/check-deps.sh"
+bash "$HOME/.codex/skills/ruliu-docs/scripts/check-deps.sh"
 ```
 
 确认身份，并从返回里拿个人知识库 `userPersonalRepo.repositoryGuid`：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" query-user-info --username "$SANDBOX_USERNAME"'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" query-user-info --username "$SANDBOX_USERNAME"'
 ```
 
 ## 读取文档
@@ -81,13 +81,13 @@ https://ku.baidu-int.com/knowledge/<spaceGuid>/<groupGuid>/<repositoryGuid>/<doc
 读 Markdown 文本：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" query-content --url "https://ku.baidu-int.com/knowledge/..." --protocol markdown --show-doc-info'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" query-content --url "https://ku.baidu-int.com/knowledge/..." --protocol markdown --show-doc-info'
 ```
 
 读编辑器 JSON：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" query-content --url "https://ku.baidu-int.com/knowledge/..." --protocol json --show-doc-info'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; "$KU" query-content --url "https://ku.baidu-int.com/knowledge/..." --protocol json --show-doc-info'
 ```
 
 要理解结构：`protocol=markdown` 的正文在 `result.text`；`protocol=json` 的正文在 `result.content`；评论不在正文 JSON 中，用 `query-comments` 单独读。
@@ -106,13 +106,13 @@ bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-cha
 创建个人知识库文档并写入正文：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; INFO="$("$KU" query-user-info --username "$SANDBOX_USERNAME")"; REPO_ID="$(printf "%s" "$INFO" | sed -n "s/.*\"repositoryGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$REPO_ID" ]; then echo "ERROR: repositoryGuid not found" >&2; exit 1; fi; CREATE="$("$KU" create-doc --repo-id "$REPO_ID" --username "$SANDBOX_USERNAME" --title "文档标题" --create-mode empty --process-images=false)"; DOC_ID="$(printf "%s" "$CREATE" | sed -n "s/.*\"docGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$DOC_ID" ]; then echo "ERROR: docGuid not found" >&2; printf "%s\n" "$CREATE"; exit 1; fi; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"paragraph","children":[{"text":"正文内容"}]}]}]'\''; "$KU" edit-content --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "$DOC_ID" --protocol markdown --show-doc-info'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; INFO="$("$KU" query-user-info --username "$SANDBOX_USERNAME")"; REPO_ID="$(printf "%s" "$INFO" | sed -n "s/.*\"repositoryGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$REPO_ID" ]; then echo "ERROR: repositoryGuid not found" >&2; exit 1; fi; CREATE="$("$KU" create-doc --repo-id "$REPO_ID" --username "$SANDBOX_USERNAME" --title "文档标题" --create-mode empty --process-images=false)"; DOC_ID="$(printf "%s" "$CREATE" | sed -n "s/.*\"docGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$DOC_ID" ]; then echo "ERROR: docGuid not found" >&2; printf "%s\n" "$CREATE"; exit 1; fi; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"paragraph","children":[{"text":"正文内容"}]}]}]'\''; "$KU" edit-content --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "$DOC_ID" --protocol markdown --show-doc-info'
 ```
 
 创建子文档：KU 文档可当目录用。传父文档 ID：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; CREATE="$("$KU" create-doc --repo-id "<repositoryGuid>" --parent-doc-id "<parentDocGuid>" --username "$SANDBOX_USERNAME" --title "子文档标题" --create-mode empty --process-images=false)"; DOC_ID="$(printf "%s" "$CREATE" | sed -n "s/.*\"docGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$DOC_ID" ]; then echo "ERROR: docGuid not found" >&2; printf "%s\n" "$CREATE"; exit 1; fi; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"paragraph","children":[{"text":"正文内容"}]}]}]'\''; "$KU" edit-content --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "$DOC_ID" --protocol markdown --show-doc-info'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; CREATE="$("$KU" create-doc --repo-id "<repositoryGuid>" --parent-doc-id "<parentDocGuid>" --username "$SANDBOX_USERNAME" --title "子文档标题" --create-mode empty --process-images=false)"; DOC_ID="$(printf "%s" "$CREATE" | sed -n "s/.*\"docGuid\": *\"\([^\"]*\)\".*/\1/p" | head -1)"; if [ -z "$DOC_ID" ]; then echo "ERROR: docGuid not found" >&2; printf "%s\n" "$CREATE"; exit 1; fi; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"paragraph","children":[{"text":"正文内容"}]}]}]'\''; "$KU" edit-content --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "$DOC_ID" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "$DOC_ID" --protocol markdown --show-doc-info'
 ```
 
 创建完必须读回，确认标题、URL、层级和正文可见。
@@ -124,7 +124,7 @@ bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-cha
 默认用 `append`，适合新增小节、追加表格、追加图片、追加总结：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"heading","level":2,"children":[{"text":"新增小节"}]},{"type":"paragraph","children":[{"text":"新增正文。"}]}]}]'\''; "$KU" edit-content --doc-id "<docGuid>" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "<docGuid>" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "<docGuid>" --protocol markdown --show-doc-info'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; KU="$SKILL/deps/ku-doc-manage/bin/ku-darwin-arm64"; OPS='\''[{"mode":"append","withNewCard":true,"json":[{"type":"heading","level":2,"children":[{"text":"新增小节"}]},{"type":"paragraph","children":[{"text":"新增正文。"}]}]}]'\''; "$KU" edit-content --doc-id "<docGuid>" --username "$SANDBOX_USERNAME" --editor-mode append --operations "$OPS"; "$KU" publish-doc --doc-id "<docGuid>" --username "$SANDBOX_USERNAME"; "$KU" query-content --doc-id "<docGuid>" --protocol markdown --show-doc-info'
 ```
 
 以下情况不要追加“修正说明”，必须 JSON 定位后 `cover` 写回：替换原文、删除原文、插入到指定标题下、修改表格行/单元格。流程：
@@ -143,19 +143,19 @@ bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-cha
 知识库搜索：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; cd "$SKILL/deps/enterprise-search/scripts"; python3 ku_search.py --word "关键词" --page 1 --page-size 10'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; cd "$SKILL/deps/enterprise-search/scripts"; python3 ku_search.py --word "关键词" --page 1 --page-size 10'
 ```
 
 企业内搜：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; cd "$SKILL/deps/enterprise-search/scripts"; python3 neisou_search.py --word "关键词" --page 1'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; cd "$SKILL/deps/enterprise-search/scripts"; python3 neisou_search.py --word "关键词" --page 1'
 ```
 
 会议、周报、OKR、通讯录也在 `deps/enterprise-search/scripts/`，按脚本名选择。通讯录：
 
 ```bash
-bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-chat-docs"; cd "$SKILL/deps/enterprise-search/scripts"; python3 address_search.py --type corpuser --q "姓名或邮箱前缀"'
+bash -lc 'export SANDBOX_USERNAME="<uuap>"; SKILL="$HOME/.codex/skills/ruliu-docs"; cd "$SKILL/deps/enterprise-search/scripts"; python3 address_search.py --type corpuser --q "姓名或邮箱前缀"'
 ```
 
 ## 表格、图片和图

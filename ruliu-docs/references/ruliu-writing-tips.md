@@ -1,12 +1,12 @@
 # 如流 KU 文档写入技巧汇总
 
-这份是从当前本地记忆、当前 Codex skill、桌面几个 `ruliu-chat-docs` 版本、`ku-doc-manage` 官方说明、`dumate-ent-info-sync` 项目经验里挑出来的可复用规则。
+这份是从当前本地记忆、当前 Codex skill、桌面几个 `ruliu-docs` 版本、`ku-doc-manage` 官方说明、`dumate-ent-info-sync` 项目经验里挑出来的可复用规则。
 
 ## 来源结论
 
 - 本地 `gw_audit_memory_analysis` 里没有找到比当前 skill 更具体的 KU 写入技巧，主要是用户任务日志和泛工作流。
-- 当前 `~/.codex/skills/ruliu-chat-docs` 和桌面 `ruliu-chat-docs final` 的核心技巧基本一致。
-- `ruliu-chat-docs final` 多了认证引导和能力映射，但如流文档写入经验主要仍在 `references/ku-doc-editing.md`、`references/ku-doc-writing/README.md`。
+- 当前 `~/.codex/skills/ruliu-docs` 和桌面 `ruliu-docs final` 的核心技巧基本一致。
+- `ruliu-docs final` 多了认证引导和能力映射，但如流文档写入经验主要仍在 `references/ku-doc-editing.md`、`references/ku-doc-writing/README.md`。
 - `dumate-ent-info-sync` 提供了大量实战经验：表格列宽、表头灰底、图片插入表格、发布后回读、避免误覆盖等。
 
 ## 读写模型

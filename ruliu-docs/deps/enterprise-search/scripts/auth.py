@@ -67,7 +67,7 @@ class AuthConfig:
                 file=sys.stderr,
             )
             print(
-                "请先运行 ruliu-chat-docs/scripts/cache-ugate-token.sh 缓存 UGate，再重试本操作。",
+                "请先运行 ruliu-docs/scripts/cache-ugate-token.sh 缓存 UGate，再重试本操作。",
                 file=sys.stderr,
             )
             sys.exit(2)

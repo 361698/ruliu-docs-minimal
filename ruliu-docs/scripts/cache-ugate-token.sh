@@ -134,6 +134,6 @@ echo "OK 已保存 UGate token 缓存：$CACHE_FILE"
 
 if [ -n "$TEST_URL" ]; then
   export SANDBOX_USERNAME="$UUAP"
-  "$SKILL_DIR/deps/ku-doc-manage/bin/ku-darwin-arm64" query-content --url "$TEST_URL" --protocol markdown --show-doc-info >/tmp/ruliu-chat-docs-ku-test.json
-  echo "OK KU 读取测试通过，结果已保存：/tmp/ruliu-chat-docs-ku-test.json"
+  "$SKILL_DIR/deps/ku-doc-manage/bin/ku-darwin-arm64" query-content --url "$TEST_URL" --protocol markdown --show-doc-info >/tmp/ruliu-docs-ku-test.json
+  echo "OK KU 读取测试通过，结果已保存：/tmp/ruliu-docs-ku-test.json"
 fi
