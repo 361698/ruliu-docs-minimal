@@ -6,7 +6,7 @@
 
 - 本地 `gw_audit_memory_analysis` 里没有找到比当前 skill 更具体的 KU 写入技巧，主要是用户任务日志和泛工作流。
 - 当前 `~/.codex/skills/ruliu-docs` 和桌面 `ruliu-docs final` 的核心技巧基本一致。
-- `ruliu-docs final` 多了认证引导和能力映射，但如流文档写入经验主要仍在 `references/ku-doc-editing.md`、`references/ku-doc-writing/README.md`。
+- `ruliu-docs final` 多了认证引导和能力映射，但如流文档写入经验主要仍在 `experiment/ku-doc-editing.md`、`experiment/ku-doc-writing/README.md`。
 - `dumate-ent-info-sync` 提供了大量实战经验：表格列宽、表头灰底、图片插入表格、发布后回读、避免误覆盖等。
 
 ## 读写模型

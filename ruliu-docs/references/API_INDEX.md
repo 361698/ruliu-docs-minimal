@@ -160,7 +160,7 @@ ku get-datasheet-records --dist-id dstxRvKjhSZZJDNvpZ --page-num 1 \
 ## 📚 相关资源
 
 - [知识库开放API官方文档](https://ku.baidu-int.com/knowledge/HFVrC7hq1Q/2tsPs8CtSd/AhkQkHD47-/CTnyWU03v7GXaf)
-- 本包 UGate 缓存脚本：`../../../scripts/cache-ugate-token.sh`
+- 本包 UGate 缓存脚本：`../scripts/cache-ugate-token.sh`
 
 ## 🆘 常见问题
 

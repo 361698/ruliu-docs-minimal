@@ -26,9 +26,9 @@ check_exec() {
 }
 
 check_path "$SKILL_DIR/SKILL.md"
-check_exec "$SKILL_DIR/deps/ku-doc-manage/bin/ku"
-check_exec "$SKILL_DIR/deps/ku-doc-manage/bin/ku-darwin-arm64"
-check_path "$SKILL_DIR/deps/enterprise-search/scripts/ku_search.py"
+check_exec "$SKILL_DIR/bin/ku"
+check_exec "$SKILL_DIR/bin/ku-darwin-arm64"
+check_path "$SKILL_DIR/scripts/enterprise-search/ku_search.py"
 check_exec "$SKILL_DIR/scripts/cache-ugate-token.sh"
 
 uuap="${SANDBOX_USERNAME:-${BAIDU_CC_USERNAME:-}}"

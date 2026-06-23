@@ -17,7 +17,7 @@
 基础命令：
 
 ```bash
-export KU="$HOME/.codex/skills/ku-doc-manage/bin/ku"
+export KU="$HOME/.codex/skills/ruliu-docs/bin/ku-darwin-arm64"
 export USERNAME="<current-uuap>"
 export DOC_ID="<target-doc-guid>"
 
