@@ -5,11 +5,13 @@ description: 如流聊天和如流/KU 文档操作入口。Use when the user men
 
 # ruliu-chat-docs
 
-此 skill 面向 `ruliu-chat-docs` 文件夹，提供如流/KU 文档读取、搜索、创建、编辑、发布、删除、子文档、表格、图片、附件和图示内容写入的操作经验。不要改名为 `ruliu-docs`。
+此 skill 面向 `ruliu-chat-docs` 文件夹，提供如流/KU 文档读取、搜索、创建、编辑、发布、删除、子文档、表格、图片、附件和图示内容写入的操作经验。技能名和文件夹名固定为 `ruliu-chat-docs`。
 
 ## 先读哪些文件
 
 - 普通读、创建、追加、删除、搜索：直接按本文命令做。
+- 需要查 KU CLI 完整命令、参数、响应字段、在线表格、数据表、权限、评论、附件、版本、复制、移动、删除：读 `deps/ku-doc-manage/references/API_INDEX.md`，再读对应子命令文档，例如 `query_content.md`、`create_doc.md`、`edit_content.md`。
+- 使用 `edit-content --editor-mode mdsl` 做局部编辑前：读 `deps/ku-doc-manage/references/edit_content.md` 和 `deps/ku-doc-manage/references/mdsl_edit_agent.md`。
 - 替换、删除中间内容、插入到指定标题下、改表格某一行：先读 `references/ku-doc-editing.md`。
 - 写产品方案、PRD、决策文档、需求分析：先读 `references/ku-doc-writing/README.md`，必要时读其中 examples。
 - 表格、图片、附件、HTML demo 截图、Mermaid/流程图：先读 `references/ruliu-writing-tips.md`，复杂节点再读 `references/ku-doc-editing.md`。
